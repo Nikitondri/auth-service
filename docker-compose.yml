@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: auth_service
+      MYSQL_PASSWORD: root
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.3
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    command: [ "start-dev" ]
+
+  spring-db-migration:
+    image: db-migrations:1.0.1
+    environment:
+      SPRING_APPLICATION_NAME: db-migration
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SERVER_PORT: 6666
+    depends_on:
+      - mysql
+
+  spring-patient-domain:
+    image: patient-domain:1.0.1
+    environment:
+      SERVER_PORT: 7777
+      SPRING_APPLICATION_NAME: gateway-service
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI: http://keycloak:8080/realms/auth-service-keycloak
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: mappings
+    depends_on:
+      - mysql
+      - keycloak
+      - spring-db-migration
+
+  spring-gateway-service:
+    image: gateway-service:1.0.1
+    ports:
+      - "8888:8888"
+    environment:
+      SERVER_PORT: 8888
+      SPRING_APPLICATION_NAME: gateway-service
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI: http://keycloak:8080/realms/auth-service-keycloak
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT-ID: auth-service-id
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT-SECRET: Z74D82MnHyLpIJh40EnpoTjN5d5uyiyp
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_AUTHORIZATION-GRANT-TYPE: authorization_code
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_SCOPE: openid
+      SPRING_SECURITY_OAUTH2_PROVIDER_KEYCLOAK_ISSUER-URI: http://keycloak:8080/realms/auth-service-keycloak
+      SPRING_SECURITY_OAUTH2_PROVIDER_KEYCLOAK_USER-NAME-ATTRIBUTE: preferred_username
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: mappings
+      KEYCLOAK_BASEURL: http://keycloak:8080
+      KEYCLOAK_CLIENTID: auth-service-id
+      KEYCLOAK_CLIENTUUID: 2eee29e8-73f2-4dce-8a1e-05543597be59
+      KEYCLOAK_CLIENTSECRET: Z74D82MnHyLpIJh40EnpoTjN5d5uyiyp
+      KEYCLOAK_PATIENTROLEID: d3b2b3a3-cc97-4459-8a29-aa16cf8d9190
+      CONNECTOR_URL_PATIENT: http://spring-patient-domain:7777
+    depends_on:
+      - mysql
+      - keycloak
+      - spring-db-migration

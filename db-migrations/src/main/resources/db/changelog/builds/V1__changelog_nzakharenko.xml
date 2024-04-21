@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+  <changeSet id="2024-04-21-01-n.zakharenko" author="n.zakharenko">
+    <comment>create table patient</comment>
+    <sql>
+      CREATE TABLE patient
+      (
+        id         VARCHAR(50)  NOT NULL UNIQUE PRIMARY KEY,
+        keycloakId VARCHAR(50)  NOT NULL,
+        name       VARCHAR(255) NOT NULL UNIQUE,
+        gender     VARCHAR(10)  NOT NULL,
+        birthDate  DATE         NOT NULL
+      );
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>

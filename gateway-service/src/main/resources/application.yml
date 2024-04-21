@@ -1,0 +1,46 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: gateway-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/auth_service
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/auth-service-keycloak
+      client:
+        registration:
+          keycloak:
+            client-id: auth-service-id
+            client-secret: Z74D82MnHyLpIJh40EnpoTjN5d5uyiyp
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/auth-service-keycloak
+            user-name-attribute: preferred_username
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: mappings
+
+keycloak:
+  baseUrl: http://localhost:8080
+  clientId: auth-service-id
+  clientUuid: 2eee29e8-73f2-4dce-8a1e-05543597be59
+  clientSecret: Z74D82MnHyLpIJh40EnpoTjN5d5uyiyp
+  patientRoleId: d3b2b3a3-cc97-4459-8a29-aa16cf8d9190
+
+connector:
+  url:
+    patient: http://localhost:7777
