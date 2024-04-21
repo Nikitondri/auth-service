@@ -1,4 +1,4 @@
-# Project README
+# AUTH_SERVICE
 
 Welcome to our Spring Boot project! This project consists of three microservices designed to work together seamlessly. Below, you'll find detailed information on each microservice and their functionalities.
 
@@ -41,19 +41,6 @@ Welcome to our Spring Boot project! This project consists of three microservices
 - Provides OAuth2 server capabilities for user authentication and authorization.
 - Offers robust security features for managing access to resources.
 - Integrates seamlessly with Spring Boot applications for securing APIs and web applications.
-
-## Setup Instructions:
-
-1. Clone the repository to your local machine.
-2. Ensure you have Java JDK installed on your system.
-3. Configure the necessary environment variables for database connection and OAuth2 settings.
-4. Build each microservice using Maven or Gradle.
-5. Run each microservice independently, starting with `db-migrations` followed by `patient-domain` and `gateway-service`.
-6. Optionally, configure Keycloak as your OAuth2 server and integrate it with `gateway-service` for user authentication and authorization.
-
-## Contributing:
-
-We welcome contributions from the community! If you have any ideas for improvements, bug fixes, or new features, feel free to open an issue or submit a pull request.
 
 ## License:
 
